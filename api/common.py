@@ -7,6 +7,10 @@ def to_camel(string: str) -> str:
 
 
 class Validator(BaseModel):
+    def json(self, **kwargs):
+        kwargs.setdefault('by_alias', True)
+        return super().json(**kwargs)
+
     class Config:
         alias_generator = to_camel
         allow_population_by_field_name = True
