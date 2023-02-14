@@ -4,7 +4,7 @@ from enum import Enum
 from pydantic import conlist
 
 from api.common import Validator
-from day.validation import GameDayCreate, GameDayBase, GameDayPatchRequest
+from api.day.validation import GameDayCreate, GameDayBase, GameDayPatchRequest
 
 
 class StatusEnum(str, Enum):
@@ -35,7 +35,7 @@ class GameBase(Validator):
                      min_items=2, max_items=2) = None
 
     # [[player_id, additional_points], ...]
-    best_players: conlist(conlist(int, min_items=2, max_items=2),
+    best_players: conlist(conlist(float, min_items=2, max_items=2),
                           min_items=2, max_items=2) = None
 
 
@@ -51,8 +51,10 @@ class GamePatchRequest(GameBase):
     number: int = None
     start_datetime: datetime = None
 
+    days: list[GameDayPatchRequest] = []
 
-class GameResponse(GamePatchRequest):
+
+class GameResponse(GameBase):
     id: int
     host_id: int
     number: int

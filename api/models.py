@@ -1,9 +1,9 @@
-from sqlalchemy import (Column, Integer, ForeignKey, ARRAY, DateTime, Enum, String,
-                        Boolean, UniqueConstraint)
+from sqlalchemy import (Column, Integer, Float, ForeignKey, ARRAY, DateTime, Enum, String,
+                        Boolean, UniqueConstraint, JSON)
 from sqlalchemy.orm import relationship
 
-from db import Base
-from game.validation import StatusEnum, WhoIsWonEnum
+from api.db import Base
+from api.game.validation import StatusEnum, WhoIsWonEnum
 
 
 class DayModel(Base):
@@ -14,7 +14,7 @@ class DayModel(Base):
     game = relationship("GameModel", back_populates="days")
     number = Column(Integer)
 
-    voting_map = Column(ARRAY(Integer))
+    voting_map = Column(JSON)
 
     __table_args__ = (
     UniqueConstraint('game_id', 'number', name='_unique_day_number_per_game'),
@@ -42,7 +42,7 @@ class GameModel(Base):
 
     players = Column(ARRAY(Integer))
     days = relationship("DayModel")
-    best_players = Column(ARRAY(Integer))
+    best_players = Column(ARRAY(Float))
 
     is_aggregated = Column(Boolean)
     inserted_at = Column(DateTime)

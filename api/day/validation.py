@@ -2,11 +2,14 @@ from pydantic import conlist
 
 from api.common import Validator
 
+class VotingObject(Validator):
+    player_id: int
+    who_put_to_vote_id: int
+    first_vote_count: int
+    second_vote_count: int
 
 class VotingMap(Validator):
-    # [[player_id, who_put_to_vote_id, first_vote_count, second_vote_count], ...]
-    voting_map: conlist(conlist(int, min_items=4, max_items=4), min_items=1,
-                        max_items=10) = None
+    voting_map: conlist(VotingObject, min_items=1, max_items=1) = None
 
 
 class GameDayBase(VotingMap):
