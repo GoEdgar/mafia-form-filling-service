@@ -1,7 +1,6 @@
-from datetime import datetime
-
 import orjson
 from bottle import request, response, Bottle
+from datetime import datetime
 from pydantic import ValidationError
 from pydantic.json import pydantic_encoder
 from sqlalchemy.exc import IntegrityError
@@ -34,8 +33,9 @@ def create_game():
         except IntegrityError:
             response.status = 409
             return {
-                "error": "The day with specified number already exists in the game."
-                }
+                "error":
+                    "The day with specified number already exists in the game."
+            }
 
         response.content_type = "application/json"
         return GameResponse.from_orm(new_game).json(by_alias=True)
@@ -49,7 +49,8 @@ def get_all_games():
         page = int(request.query.get('page', 1))
         if limit < 1 or page < 1:
             response.status = 400
-            return {"error": "'page' and 'limit' params must be greater than 0."}
+            return {
+                "error": "'page' and 'limit' params must be greater than 0."}
 
         # calculate the offset based on the limit and page number
         offset = (page - 1) * limit
@@ -68,13 +69,14 @@ def get_all_games():
         return orjson.dumps(
             tuple(GameResponse.from_orm(game) for game in games),
             default=pydantic_encoder
-            )
+        )
 
 
 @app.get("/game/<game_id>")
 def get_game(game_id: int):
     with Session() as session:
-        game = session.query(GameModel).filter(GameModel.id == game_id).one_or_none()
+        game = session.query(GameModel).filter(
+            GameModel.id == game_id).one_or_none()
 
         if game is None:
             response.status = 404
@@ -96,7 +98,7 @@ def update_game(game_id: int):
     with Session() as session:
         is_game_updated = session.query(GameModel).where(
             GameModel.id == game_id
-            ).update(game_data.dict(exclude={"days"}))
+        ).update(game_data.dict(exclude={"days"}))
         if not is_game_updated:
             session.rollback()
 
@@ -107,7 +109,7 @@ def update_game(game_id: int):
             is_day_updated = session.query(DayModel).where(
                 DayModel.game_id == game_id,
                 DayModel.number == day.number
-                ).update(day.dict(exclude={"number"}))
+            ).update(day.dict(exclude={"number"}))
 
             if not is_day_updated:
                 session.rollback()
@@ -121,7 +123,8 @@ def update_game(game_id: int):
 @app.delete("/game/<game_id>")
 def delete_game(game_id: int):
     with Session() as session:
-        game = session.query(GameModel).where(GameModel.id == game_id).one_or_none()
+        game = session.query(GameModel).where(
+            GameModel.id == game_id).one_or_none()
         if game is None:
             response.status = 404
             return {"error": "Game not found"}

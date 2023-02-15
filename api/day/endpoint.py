@@ -1,12 +1,12 @@
 from bottle import request, response
+from models import DayModel
 from psycopg2.errors import ForeignKeyViolation, UniqueViolation
 from pydantic import ValidationError
 from sqlalchemy.exc import IntegrityError
 
 from api.app import app
 from api.db import Session
-from models import DayModel
-from .validation import GameDayCreate, GameDayResponse, GameDayPatchRequest
+from .validation import GameDayResponse, GameDayPatchRequest
 
 
 @app.post("/day")
@@ -30,8 +30,9 @@ def create_game_day():
             if isinstance(error.orig, UniqueViolation):
                 response.status = 409
                 return {
-                    "error": "The day with specified number already exists in the game"
-                    }
+                    "error": "The day with specified number "
+                             "already exists in the game"
+                }
 
         response.content_type = "application/json"
         return GameDayResponse.from_orm(new_day).json()

@@ -1,6 +1,5 @@
 from datetime import datetime
 from enum import Enum
-
 from pydantic import conlist
 
 from api.common import Validator
