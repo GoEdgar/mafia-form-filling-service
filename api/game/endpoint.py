@@ -1,16 +1,17 @@
 from datetime import datetime
 
 import orjson
-from bottle import request, response
+from bottle import request, response, Bottle
 from pydantic import ValidationError
 from pydantic.json import pydantic_encoder
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import joinedload
 
-from api.app import app
 from api.db import Session
-from models import GameModel, DayModel
+from api.models import GameModel, DayModel
 from .validation import GameCreateRequest, GamePatchRequest, GameResponse
+
+app = Bottle()
 
 
 @app.post("/game")
