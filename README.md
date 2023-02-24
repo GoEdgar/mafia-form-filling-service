@@ -4,6 +4,7 @@
 
 * Install dependencies
     ```bash
+    pip install 'setuptools<58.0.0'
     pip install -r requirements.txt
     ```
 * Set the following environment variables:
