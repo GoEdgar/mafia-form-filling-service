@@ -1,4 +1,5 @@
-from sqlalchemy import (Column, Integer, Float, ForeignKey, ARRAY, DateTime, Enum, String,
+from sqlalchemy import (Column, Integer, Float, ForeignKey, ARRAY, DateTime,
+                        Enum, String,
                         Boolean, UniqueConstraint, JSON)
 from sqlalchemy.orm import relationship
 
@@ -17,7 +18,8 @@ class DayModel(Base):
     voting_map = Column(JSON)
 
     __table_args__ = (
-    UniqueConstraint('game_id', 'number', name='_unique_day_number_per_game'),
+        UniqueConstraint('game_id', 'number',
+                         name='_unique_day_number_per_game'),
     )
 
 
