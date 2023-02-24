@@ -4,7 +4,7 @@
 
 * Install dependencies
     ```bash
-    pip install requirements.txt
+    pip install -r requirements.txt
     ```
 * Set the following environment variables:
     ```text
