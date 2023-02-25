@@ -1,14 +1,15 @@
-from bottle import request, response, post, route, delete
+from bottle import request, response
 from psycopg2.errors import ForeignKeyViolation, UniqueViolation
 from pydantic import ValidationError
 from sqlalchemy.exc import IntegrityError
 
+from api.app import app
 from api.db import Session
 from model import DayModel
-from validation import GameDayResponse, GameDayPatchRequest
+from .validation import GameDayResponse, GameDayPatchRequest
 
 
-@post('/day')
+@app.post('/day')
 def create_game_day():
     try:
         game_data = GameDayCreateRequest(**request.json)
@@ -37,7 +38,7 @@ def create_game_day():
         return GameDayResponse.from_orm(new_day).json()
 
 
-@route('/day/<id>', 'PATCH')
+@app.route('/day/<id>', 'PATCH')
 def update_game_day(id: int):
     try:
         day_data = GameDayPatchRequest(**request.json)
@@ -54,7 +55,7 @@ def update_game_day(id: int):
         session.commit()
 
 
-@delete('/day/<id>')
+@app.delete('/day/<id>')
 def delete_game_day(id: int):
     with Session() as session:
         day = session.query(DayModel).where(DayModel.id == id).one_or_none()
