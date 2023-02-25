@@ -3,8 +3,8 @@ from psycopg2.errors import ForeignKeyViolation, UniqueViolation
 from pydantic import ValidationError
 from sqlalchemy.exc import IntegrityError
 
-import app
 from api.db import Session
+from app import app
 from model import DayModel
 from validation import GameDayResponse, GameDayPatchRequest
 
