@@ -129,6 +129,5 @@ dmypy.json
 .pyre/
 
 .idea
-migrations/versions
 /migrations/README
 .DS_Store

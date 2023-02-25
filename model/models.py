@@ -3,8 +3,8 @@ from sqlalchemy import (Column, Integer, Float, ForeignKey, ARRAY, DateTime,
                         Boolean, UniqueConstraint, JSON)
 from sqlalchemy.orm import relationship
 
-from api.db import Base
 from api.game.validation import StatusEnum, WhoIsWonEnum
+from model import Base
 
 
 class DayModel(Base):
