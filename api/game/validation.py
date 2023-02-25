@@ -42,7 +42,6 @@ class GameBase(Validator):
 class GameCreateRequest(GameBase):
     host_id: int
     number: int
-    start_datetime: datetime
 
     days: list[GameDayCreate] = []
 
