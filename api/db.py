@@ -1,10 +1,7 @@
 import os
 
-from dictalchemy import DictableModel
 from sqlalchemy import create_engine
-from sqlalchemy.orm import declarative_base, sessionmaker
-
-Base = declarative_base(cls=DictableModel)
+from sqlalchemy.orm import sessionmaker
 
 db_user = os.environ.get('DB_USER')
 db_password = os.environ.get('DB_PASSWORD')

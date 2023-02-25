@@ -8,8 +8,8 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import joinedload
 
 from api.db import Session
-from api.models import GameModel, DayModel
-from .validation import GameCreateRequest, GamePatchRequest, GameResponse
+from model.models import GameModel, DayModel
+from validation import GameCreateRequest, GamePatchRequest, GameResponse
 
 app = Bottle()
 
