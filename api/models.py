@@ -8,11 +8,11 @@ from api.game.validation import StatusEnum, WhoIsWonEnum
 
 
 class DayModel(Base):
-    __tablename__ = "day"
+    __tablename__ = 'day'
 
     id = Column(Integer, primary_key=True)
-    game_id = Column(Integer, ForeignKey("game.id"))
-    game = relationship("GameModel", back_populates="days")
+    game_id = Column(Integer, ForeignKey('game.id'))
+    game = relationship('GameModel', back_populates='days')
     number = Column(Integer)
 
     voting_map = Column(JSON)
@@ -24,7 +24,7 @@ class DayModel(Base):
 
 
 class GameModel(Base):
-    __tablename__ = "game"
+    __tablename__ = 'game'
 
     id = Column(Integer, primary_key=True)
     host_id = Column(Integer)
@@ -43,7 +43,7 @@ class GameModel(Base):
     first_shoot_player_id = Column(Integer)
 
     players = Column(ARRAY(Integer))
-    days = relationship("DayModel")
+    days = relationship('DayModel')
     best_players = Column(ARRAY(Float))
 
     is_aggregated = Column(Boolean)

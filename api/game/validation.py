@@ -7,13 +7,13 @@ from api.day.validation import GameDayCreate, GameDayBase, GameDayPatchRequest
 
 
 class StatusEnum(str, Enum):
-    IN_PROGRESS = "IN_PROGRESS"
-    COMPLETED = "COMPLETED"
+    IN_PROGRESS = 'IN_PROGRESS'
+    COMPLETED = 'COMPLETED'
 
 
 class WhoIsWonEnum(str, Enum):
-    RED = "RED"
-    BLACK = "BLACK"
+    RED = 'RED'
+    BLACK = 'BLACK'
 
 
 class GameBase(Validator):
