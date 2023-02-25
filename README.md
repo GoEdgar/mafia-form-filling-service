@@ -31,5 +31,5 @@
     ```
 * Then run web-server (configure the port if you need):
     ```bash
-    gunicorn --bind 0.0.0.0:8000 -w 1 -t 4 app:app
+    gunicorn --bind 0.0.0.0:8000 -w 1 -t 4 main:app
     ```
