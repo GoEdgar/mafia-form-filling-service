@@ -1,19 +1,18 @@
 from datetime import datetime
 
 import orjson
-from bottle import request, response
+from bottle import request, response, post, get, route, delete
 from pydantic import ValidationError
 from pydantic.json import pydantic_encoder
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import joinedload
 
 from api.db import Session
-from app import app
 from model.models import GameModel, DayModel
 from validation import GameCreateRequest, GamePatchRequest, GameResponse
 
 
-@app.post('/game')
+@post('/game')
 def create_game():
     try:
         game_data = GameCreateRequest(**request.json)
@@ -41,7 +40,7 @@ def create_game():
         return GameResponse.from_orm(new_game).json(by_alias=True)
 
 
-@app.get('/game')
+@get('/game')
 def get_all_games():
     with Session() as session:
         # get the limit and page parameters from the request
@@ -72,7 +71,7 @@ def get_all_games():
         )
 
 
-@app.get('/game/<game_id>')
+@get('/game/<game_id>')
 def get_game(game_id: int):
     with Session() as session:
         game = session.query(GameModel).filter(
@@ -86,7 +85,7 @@ def get_game(game_id: int):
         return GameResponse.from_orm(game).json()
 
 
-@app.route('/game/<game_id:int>', 'PATCH')
+@route('/game/<game_id:int>', 'PATCH')
 def update_game(game_id: int):
     try:
         game_data = GamePatchRequest(**request.json)
@@ -120,7 +119,7 @@ def update_game(game_id: int):
         session.commit()
 
 
-@app.delete('/game/<game_id>')
+@delete('/game/<game_id>')
 def delete_game(game_id: int):
     with Session() as session:
         game = session.query(GameModel).where(
