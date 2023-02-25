@@ -1,6 +1,7 @@
 import os
-from alembic import context
 from logging.config import fileConfig
+
+from alembic import context
 from sqlalchemy import create_engine
 
 from api.models import Base

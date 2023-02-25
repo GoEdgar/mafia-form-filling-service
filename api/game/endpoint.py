@@ -1,6 +1,7 @@
+from datetime import datetime
+
 import orjson
 from bottle import request, response, Bottle
-from datetime import datetime
 from pydantic import ValidationError
 from pydantic.json import pydantic_encoder
 from sqlalchemy.exc import IntegrityError
