@@ -25,6 +25,7 @@ def create_game():
     with Session() as session:
         new_game = GameModel(**game_data.dict(exclude={'days'}))
         new_game.inserted_at = datetime.now()
+        new_game.updated_at = new_game.inserted_at
         new_game.start_datetime = new_game.inserted_at
         new_game.days = [DayModel(**day.dict(exclude_none=True)) for day in
                          game_data.days]
