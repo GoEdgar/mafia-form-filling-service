@@ -15,6 +15,7 @@ class StatusEnum(str, Enum):
 class WhoIsWonEnum(str, Enum):
     RED = 'RED'
     BLACK = 'BLACK'
+    DRAW = 'DRAW'
 
 
 class GameBase(Validator):
