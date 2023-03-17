@@ -98,9 +98,8 @@ def update_game(game_id: int):
         return {'error': str(e)}
 
     with Session() as session:
-        is_game_updated = session.query(GameModel).where(
-            GameModel.id == game_id
-        ).update(game_data.dict(exclude={'days'}))
+        game = session.query(GameModel).filter(GameModel.id == game_id)
+        is_game_updated = game.update(game_data.dict(exclude={'days'}))
         if not is_game_updated:
             session.rollback()
 
@@ -120,6 +119,9 @@ def update_game(game_id: int):
                 return {'error': f'Day with number {day.number} not found'}
 
         session.commit()
+
+        response.content_type = 'application/json'
+        return GameResponse.from_orm(game.one()).json()
 
 
 @app.delete('/game/<game_id>')
