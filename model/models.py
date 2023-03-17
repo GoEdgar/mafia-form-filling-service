@@ -46,6 +46,6 @@ class GameModel(Base):
     days = relationship('DayModel')
     best_players = Column(ARRAY(Float))
 
-    is_aggregated = Column(Boolean)
+    is_aggregated = Column(Boolean, default=False)
     inserted_at = Column(DateTime)
     updated_at = Column(DateTime)
