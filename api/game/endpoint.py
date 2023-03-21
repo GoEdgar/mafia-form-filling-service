@@ -70,7 +70,7 @@ def get_all_games():
         # return the subset of games as a JSON response
         response.content_type = 'application/json'
         return orjson.dumps(
-            tuple(GameResponse.from_orm(game) for game in games),
+            tuple(orjson.loads(GameResponse.from_orm(game).json(by_alias=True)) for game in games),
             default=pydantic_encoder
         )
 
