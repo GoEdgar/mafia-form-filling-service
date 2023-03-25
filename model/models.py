@@ -2,6 +2,7 @@ from sqlalchemy import (Column, Integer, Float, ForeignKey, ARRAY, DateTime,
                         Enum, String,
                         Boolean, UniqueConstraint, JSON)
 from sqlalchemy.orm import relationship
+from sqlalchemy.sql import expression
 
 from api.game.validation import StatusEnum, WhoIsWonEnum
 from model import Base
@@ -46,6 +47,6 @@ class GameModel(Base):
     days = relationship('DayModel')
     best_players = Column(ARRAY(Float))
 
-    is_aggregated = Column(Boolean, default=False)
+    is_aggregated = Column(Boolean, server_default=expression.false())
     inserted_at = Column(DateTime)
     updated_at = Column(DateTime)
