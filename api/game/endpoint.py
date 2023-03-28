@@ -91,38 +91,43 @@ def get_game(game_id: int):
 
 @app.route('/game/<game_id:int>', 'PATCH')
 def update_game(game_id: int):
+    response.content_type = 'application/json'
+
     try:
         game_data = GamePatchRequest(**request.json)
     except ValidationError as e:
-
         response.status = 400
         return {'error': str(e)}
 
     with Session() as session:
-        game = session.query(GameModel).filter(GameModel.id == game_id)
-        is_game_updated = game.update(game_data.dict(exclude={'days'}))
-        if not is_game_updated:
+        game = session.query(GameModel).filter(GameModel.id == game_id).one_or_none()
+        if game is None:
             session.rollback()
 
             response.status = 404
             return {'error': 'Game not found'}
 
+        new_fields = game_data.dict(exclude={'days'}, exclude_unset=True)
+        if not new_fields:
+            return GameResponse.from_orm(game).json()
+
+        game.update(**new_fields)
+        game.updated_at = datetime.now()
+
         for day in game_data.days:
-            is_day_updated = session.query(DayModel).where(
+            game_day = session.query(DayModel).where(
                 DayModel.game_id == game_id,
                 DayModel.number == day.number
-            ).update(day.dict(exclude={'number'}))
-
-            if not is_day_updated:
-                session.rollback()
-
-                response.status = 404
-                return {'error': f'Day with number {day.number} not found'}
+            ).one_or_none()
+            if game_day is None:
+                new_day = DayModel(**day.dict(exclude_unset=True))
+                session.add(new_day)
+            else:
+                game_day.update(**day.dict(exclude_unset=True))
 
         session.commit()
 
-        response.content_type = 'application/json'
-        return GameResponse.from_orm(game.one()).json()
+        return GameResponse.from_orm(game).json()
 
 
 @app.delete('/game/<game_id>')

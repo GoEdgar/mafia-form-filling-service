@@ -1,4 +1,11 @@
 from dictalchemy import DictableModel
 from sqlalchemy.orm import declarative_base
 
-Base = declarative_base(cls=DictableModel)
+class CustomBase(DictableModel):
+    def update(self, **kwargs):
+        for key, value in kwargs.items():
+            if hasattr(self, key):
+                setattr(self, key, value)
+
+Base = declarative_base(cls=CustomBase)
+
