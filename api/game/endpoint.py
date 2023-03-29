@@ -24,9 +24,9 @@ def create_game():
 
     with Session() as session:
         new_game = GameModel(**game_data.dict(exclude={'days'}))
-        new_game.inserted_at = datetime.now()
+        new_game.inserted_at = game_data.inserted_at or datetime.now()
         new_game.updated_at = new_game.inserted_at
-        new_game.start_datetime = new_game.inserted_at
+        new_game.start_datetime = game_data.start_datetime or new_game.inserted_at
         new_game.days = [DayModel(**day.dict(exclude_none=True)) for day in
                          game_data.days]
         session.add(new_game)
@@ -75,7 +75,7 @@ def get_all_games():
         )
 
 
-@app.get('/game/<game_id>')
+@app.get('/game/<game_id:int>')
 def get_game(game_id: int):
     with Session() as session:
         game = session.query(GameModel).filter(
@@ -100,37 +100,21 @@ def update_game(game_id: int):
         return {'error': str(e)}
 
     with Session() as session:
-        game = session.query(GameModel).filter(GameModel.id == game_id).one_or_none()
-        if game is None:
+        game_data.updated_at = game_data.updated_at or datetime.now()
+
+        game = session.query(GameModel).filter(GameModel.id == game_id)
+        is_game_updated = game.update(game_data.dict(exclude={'days'}, exclude_unset=True))
+        if not is_game_updated:
             session.rollback()
 
             response.status = 404
             return {'error': 'Game not found'}
 
-        new_fields = game_data.dict(exclude={'days'}, exclude_unset=True)
-        if not new_fields:
-            return GameResponse.from_orm(game).json()
-
-        game.update(**new_fields)
-        game.updated_at = datetime.now()
-
-        for day in game_data.days:
-            game_day = session.query(DayModel).where(
-                DayModel.game_id == game_id,
-                DayModel.number == day.number
-            ).one_or_none()
-            if game_day is None:
-                new_day = DayModel(**day.dict(exclude_unset=True))
-                session.add(new_day)
-            else:
-                game_day.update(**day.dict(exclude_unset=True))
-
         session.commit()
-
         return GameResponse.from_orm(game).json()
 
 
-@app.delete('/game/<game_id>')
+@app.delete('/game/<game_id:int>')
 def delete_game(game_id: int):
     with Session() as session:
         game = session.query(GameModel).where(
