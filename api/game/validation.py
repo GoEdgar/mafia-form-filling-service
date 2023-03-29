@@ -20,6 +20,7 @@ class WhoIsWonEnum(str, Enum):
 
 class GameBase(Validator):
     best_move: list[int] = None
+    start_datetime: datetime = None
     end_datetime: datetime = None
     status: StatusEnum = None
     won: WhoIsWonEnum = None
@@ -39,6 +40,9 @@ class GameBase(Validator):
     best_players: conlist(conlist(float, min_items=2, max_items=2),
                           min_items=0, max_items=10) = None
 
+    inserted_at: datetime = None
+
+
 
 class GameCreateRequest(GameBase):
     host_id: int
@@ -48,19 +52,19 @@ class GameCreateRequest(GameBase):
 
 
 class GamePatchRequest(GameBase):
+    host_id: int = None
     number: int = None
-    start_datetime: datetime = None
 
-    days: list[GameDayPatchRequest] = []
+    is_aggregated: bool = None
+    updated_at: datetime = None
+    # days: list[GameDayPatchRequest] = []
 
 
 class GameResponse(GameBase):
     id: int
     host_id: int
     number: int
-    start_datetime: datetime
     is_aggregated: bool = None
-    inserted_at: datetime = None
     updated_at: datetime = None
 
     days: list[GameDayBase] = []
