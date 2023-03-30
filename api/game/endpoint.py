@@ -111,7 +111,7 @@ def update_game(game_id: int):
             return {'error': 'Game not found'}
 
         session.commit()
-        return GameResponse.from_orm(game).json()
+        return GameResponse.from_orm(game.one()).json()
 
 
 @app.delete('/game/<game_id:int>')
