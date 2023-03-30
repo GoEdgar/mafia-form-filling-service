@@ -45,7 +45,7 @@ class GameBase(Validator):
 
     @pydantic.root_validator()
     @classmethod
-    def validate_all_fields_at_the_same_time(cls, field_values):
+    def validate_unique_user_ids(cls, field_values):
         if field_values["players"]:
             unique_ids = {
                 field_values["host_id"],
