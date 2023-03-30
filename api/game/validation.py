@@ -39,7 +39,7 @@ class GameBase(Validator):
 
     # [[player_id, additional_points], ...]
     best_players: conlist(conlist(float, min_items=2, max_items=2),
-                          min_items=0, max_items=10) = None
+                          min_items=10, max_items=10) = None
 
     inserted_at: datetime = None
 
