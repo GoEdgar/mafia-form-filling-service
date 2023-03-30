@@ -1,6 +1,7 @@
 from datetime import datetime
 from enum import Enum
 
+import pydantic
 from pydantic import conlist
 
 from api.common import Validator
@@ -42,6 +43,18 @@ class GameBase(Validator):
 
     inserted_at: datetime = None
 
+    @pydantic.root_validator()
+    @classmethod
+    def validate_all_fields_at_the_same_time(cls, field_values):
+        if field_values["players"]:
+            unique_ids = {
+                field_values["host_id"],
+                *(player[0] for player in field_values["players"]),
+                }
+            if len(unique_ids) < len(field_values["players"]) + 1:
+                raise ValueError("There are duplicates around players and host")
+
+        return field_values
 
 
 class GameCreateRequest(GameBase):
