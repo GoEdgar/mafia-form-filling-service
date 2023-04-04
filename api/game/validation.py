@@ -43,10 +43,9 @@ class GameBase(Validator):
 
     inserted_at: datetime = None
 
-    @pydantic.root_validator()
-    @classmethod
+    @pydantic.root_validator
     def validate_unique_user_ids(cls, field_values):
-        if field_values["players"]:
+        if field_values.get("players"):
             unique_ids = {
                 field_values["host_id"],
                 *(player[0] for player in field_values["players"]),
