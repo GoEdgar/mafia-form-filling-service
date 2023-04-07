@@ -9,7 +9,7 @@ from sqlalchemy.orm import joinedload
 
 from api.db import Session
 from model import GameModel, DayModel
-from .validation import GameCreateRequest, GamePatchRequest, GameResponse
+from .validation import GameCreateRequest, GamePatchRequest, GameResponse, GameListResponse
 
 app = Bottle()
 
@@ -66,13 +66,14 @@ def get_all_games():
             .limit(limit) \
             .offset(offset) \
             .options(joinedload(GameModel.days))
+        games_count = session.query(GameModel).count()
 
         # return the subset of games as a JSON response
         response.content_type = 'application/json'
-        return orjson.dumps(
-            tuple(orjson.loads(GameResponse.from_orm(game).json(by_alias=True)) for game in games),
-            default=pydantic_encoder
-        )
+        return GameListResponse(
+            games=[GameResponse.from_orm(game) for game in games],
+            games_count=games_count
+            ).json()
 
 
 @app.get('/game/<game_id:int>')

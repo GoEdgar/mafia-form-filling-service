@@ -80,3 +80,8 @@ class GameResponse(GameBase):
     updated_at: datetime = None
 
     days: list[GameDayBase] = []
+
+
+class GameListResponse(Validator):
+    games: list[GameResponse]
+    games_count: int
