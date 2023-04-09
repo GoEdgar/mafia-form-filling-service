@@ -5,7 +5,7 @@ import pydantic
 from pydantic import conlist
 
 from api.common import Validator
-from api.day.validation import GameDayCreate, GameDayBase, GameDayPatchRequest
+from api.day.validation import GameDayCreate, GameDayBase
 
 
 class StatusEnum(str, Enum):
@@ -45,6 +45,7 @@ class GameBase(Validator):
 
     @pydantic.root_validator
     def validate_unique_user_ids(cls, field_values):
+        # all user ids are unique constraint
         if field_values.get("players"):
             unique_ids = {
                 field_values["host_id"],
@@ -52,6 +53,11 @@ class GameBase(Validator):
                 }
             if len(unique_ids) < len(field_values["players"]) + 1:
                 raise ValueError("There are duplicates around players and host")
+
+        # start_datetime < end_datetime constraint
+        if all((field_values.get("start_datetime"), field_values.get("end_datetime"))) \
+            and field_values["start_datetime"] >= field_values["end_datetime"]:
+                raise ValueError("start_datetime should be greater than end_datetime")
 
         return field_values
 

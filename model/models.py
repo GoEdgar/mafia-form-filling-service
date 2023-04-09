@@ -1,6 +1,6 @@
 from sqlalchemy import (Column, Integer, Float, ForeignKey, ARRAY, DateTime,
                         Enum, String,
-                        Boolean, UniqueConstraint, JSON)
+                        Boolean, UniqueConstraint, CheckConstraint, JSON)
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import expression
 
@@ -50,3 +50,7 @@ class GameModel(Base):
     is_aggregated = Column(Boolean, server_default=expression.false())
     inserted_at = Column(DateTime)
     updated_at = Column(DateTime)
+
+    __table_args__ = (
+        CheckConstraint("start_datetime < end_datetime", name="start_dt_greater_than_end_dt"),
+    )
