@@ -28,6 +28,7 @@ class GameModel(Base):
     __tablename__ = 'game'
 
     id = Column(Integer, primary_key=True)
+    creator_id = Column(Integer, nullable=False)
     host_id = Column(Integer)
     number = Column(Integer)
     best_move = Column(ARRAY(Integer))
