@@ -1,28 +1,28 @@
 from datetime import datetime
-
+from datetime import timezone
 from bottle import request, response, Bottle, error
 from pydantic import ValidationError
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import joinedload
 
 from api.db import Session
+from app import exception_middleware
 from model import GameModel, DayModel
-from .validation import GameCreateRequest, GamePatchRequest, GameResponse, GameListResponse
+from .validation import GameCreateRequest, GamePatchRequest, GameResponse, GameListResponse, validate_game_constraints
 
 app = Bottle()
 
 
 @app.post('/game')
+@exception_middleware
 def create_game():
-    try:
-        game_data = GameCreateRequest(**request.json)
-    except ValidationError as e:
-        response.status = 400
-        return {'error': str(e)}
+    game_data = GameCreateRequest(**request.json)
+    validate_game_constraints(game_data)
 
     with Session() as session:
         new_game = GameModel(**game_data.dict(exclude={'days'}))
-        new_game.inserted_at = game_data.inserted_at or datetime.now()
+        new_game.host_id = new_game.host_id or new_game.creator_id
+        new_game.inserted_at = game_data.inserted_at or datetime.now(tz=timezone.utc)
         new_game.updated_at = new_game.inserted_at
         new_game.start_datetime = game_data.start_datetime or new_game.inserted_at
         new_game.days = [DayModel(**day.dict(exclude_none=True)) for day in
@@ -31,14 +31,14 @@ def create_game():
 
         try:
             session.commit()
-        except IntegrityError:
+        except IntegrityError as e:
+            print(e)
             response.status = 409
             return {
                 'error':
                     'The day with specified number already exists in the game.'
             }
 
-        response.content_type = 'application/json'
         return GameResponse.from_orm(new_game).json(by_alias=True)
 
 
@@ -67,7 +67,6 @@ def get_all_games():
         games_count = session.query(GameModel).count()
 
         # return the subset of games as a JSON response
-        response.content_type = 'application/json'
         return GameListResponse(
             games=[GameResponse.from_orm(game) for game in games],
             games_count=games_count
@@ -84,33 +83,27 @@ def get_game(game_id: int):
             response.status = 404
             return {'error': 'Game not found'}
 
-        response.content_type = 'application/json'
         return GameResponse.from_orm(game).json()
 
 
 @app.route('/game/<game_id:int>', 'PATCH')
+@exception_middleware
 def update_game(game_id: int):
-    response.content_type = 'application/json'
-
-    try:
-        game_data = GamePatchRequest(**request.json)
-    except ValidationError as e:
-        response.status = 400
-        return {'error': str(e)}
+    game_data = GamePatchRequest(**request.json)
 
     with Session() as session:
         game_data.updated_at = game_data.updated_at or datetime.now()
 
-        game = session.query(GameModel).filter(GameModel.id == game_id)
-        is_game_updated = game.update(game_data.dict(exclude={'days'}, exclude_unset=True))
-        if not is_game_updated:
-            session.rollback()
-
+        game = session.query(GameModel).filter(GameModel.id == game_id).one_or_none()
+        if game is None:
             response.status = 404
             return {'error': 'Game not found'}
 
+        game.update(**game_data.dict(exclude={'days'}, exclude_unset=True))
+        validate_game_constraints(game)
+
         session.commit()
-        return GameResponse.from_orm(game.one()).json()
+        return GameResponse.from_orm(game).json()
 
 
 @app.delete('/game/<game_id:int>')

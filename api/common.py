@@ -7,7 +7,7 @@ def to_camel(string: str) -> str:
         word.capitalize() for word in string_split[1:])
 
 
-class Validator(BaseModel):
+class BaseValidator(BaseModel):
     def json(self, **kwargs):
         kwargs.setdefault('by_alias', True)
         return super().json(**kwargs)

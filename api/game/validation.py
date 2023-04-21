@@ -1,10 +1,10 @@
-from datetime import datetime
+from datetime import datetime, timezone
 from enum import Enum
 
 import pydantic
-from pydantic import conlist
+from pydantic import conlist, ValidationError
 
-from api.common import Validator
+from api.common import BaseValidator
 from api.day.validation import GameDayCreate, GameDayBase
 
 
@@ -19,7 +19,8 @@ class WhoIsWonEnum(str, Enum):
     DRAW = 'DRAW'
 
 
-class GameBase(Validator):
+class GameBase(BaseValidator):
+    host_id: int = None
     best_move: list[int] = None
     start_datetime: datetime = None
     end_datetime: datetime = None
@@ -43,34 +44,15 @@ class GameBase(Validator):
 
     inserted_at: datetime = None
 
-    @pydantic.root_validator
-    def validate_unique_user_ids(cls, field_values):
-        # all user ids are unique constraint
-        if field_values.get("players"):
-            unique_ids = {
-                field_values["host_id"],
-                *(player[0] for player in field_values["players"]),
-                }
-            if len(unique_ids) < len(field_values["players"]) + 1:
-                raise ValueError("There are duplicates around players and host")
-
-        # start_datetime < end_datetime constraint
-        if all((field_values.get("start_datetime"), field_values.get("end_datetime"))) \
-            and field_values["start_datetime"] >= field_values["end_datetime"]:
-                raise ValueError("start_datetime should be greater than end_datetime")
-
-        return field_values
-
 
 class GameCreateRequest(GameBase):
-    host_id: int
+    creator_id: int
     number: int
 
     days: list[GameDayCreate] = []
 
 
 class GamePatchRequest(GameBase):
-    host_id: int = None
     number: int = None
 
     is_aggregated: bool = None
@@ -80,14 +62,32 @@ class GamePatchRequest(GameBase):
 
 class GameResponse(GameBase):
     id: int
-    host_id: int
     number: int
+    creator_id: int
+    host_id: int = None
     is_aggregated: bool = None
     updated_at: datetime = None
 
     days: list[GameDayBase] = []
 
 
-class GameListResponse(Validator):
+class GameListResponse(BaseValidator):
     games: list[GameResponse]
     games_count: int
+
+
+def validate_game_constraints(game):
+    # all user ids are unique constraint
+    if game.players:
+        unique_ids = {
+            game.host_id or game.creator_id,
+            *(player[0] for player in game.players),
+            }
+        if len(unique_ids) < len(game.players) + 1:
+            raise ValueError("There are duplicates around players and host")
+
+    # start_datetime < end_datetime constraint
+    if all((game.start_datetime, game.end_datetime)) \
+            and game.start_datetime.replace(tzinfo=timezone.utc) \
+                >= game.end_datetime.replace(tzinfo=timezone.utc):
+        raise ValueError("start_datetime should be greater than end_datetime")

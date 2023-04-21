@@ -13,4 +13,4 @@ engine = create_engine(
     f'postgresql://{db_user}:{db_password}@{db_host}:{db_port}/{db_name}',
 )
 
-Session = sessionmaker(engine)
+Session = sessionmaker(engine, autoflush=False)
