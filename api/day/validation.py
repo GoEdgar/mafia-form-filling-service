@@ -1,16 +1,16 @@
 from pydantic import conlist
 
-from api.common import Validator
+from api.common import BaseValidator
 
 
-class VotingObject(Validator):
+class VotingObject(BaseValidator):
     player_id: int
     who_put_to_vote_id: int
     first_vote_count: int
     second_vote_count: int
 
 
-class VotingMap(Validator):
+class VotingMap(BaseValidator):
     voting_map: conlist(VotingObject, min_items=1, max_items=1) = None
 
 

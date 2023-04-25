@@ -6,7 +6,7 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import joinedload
 
 from api.db import Session
-from app import exception_middleware
+from api.app import exception_middleware
 from model import GameModel, DayModel
 from .validation import GameCreateRequest, GamePatchRequest, GameResponse, GameListResponse, validate_game_constraints
 
