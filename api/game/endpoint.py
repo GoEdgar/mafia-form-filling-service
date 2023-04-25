@@ -1,16 +1,13 @@
 from datetime import datetime
 from datetime import timezone
-from bottle import request, response, Bottle, error
-from pydantic import ValidationError
+from bottle import request, response
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import joinedload
 
 from api.db import Session
-from api.app import exception_middleware
+from app import app, exception_middleware
 from model import GameModel, DayModel
 from .validation import GameCreateRequest, GamePatchRequest, GameResponse, GameListResponse, validate_game_constraints
-
-app = Bottle()
 
 
 @app.post('/game')
@@ -22,8 +19,7 @@ def create_game():
     with Session() as session:
         new_game = GameModel(**game_data.dict(exclude={'days'}))
         new_game.host_id = new_game.host_id or new_game.creator_id
-        new_game.inserted_at = game_data.inserted_at or \
-                               datetime.now(tz=timezone.utc)
+        new_game.inserted_at = game_data.inserted_at or datetime.now(tz=timezone.utc)
         new_game.updated_at = new_game.inserted_at
         new_game.start_datetime = game_data.start_datetime or new_game.inserted_at
         new_game.days = [DayModel(**day.dict(exclude_none=True)) for day in
@@ -71,7 +67,7 @@ def get_all_games():
         return GameListResponse(
             games=[GameResponse.from_orm(game) for game in games],
             games_count=games_count
-        ).json()
+            ).json()
 
 
 @app.get('/game/<game_id:int>')
@@ -95,8 +91,7 @@ def update_game(game_id: int):
     with Session() as session:
         game_data.updated_at = game_data.updated_at or datetime.now()
 
-        game = session.query(GameModel) \
-            .filter(GameModel.id == game_id).one_or_none()
+        game = session.query(GameModel).filter(GameModel.id == game_id).one_or_none()
         if game is None:
             response.status = 404
             return {'error': 'Game not found'}

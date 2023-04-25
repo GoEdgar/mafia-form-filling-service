@@ -10,22 +10,19 @@ class VotingObject(BaseValidator):
     second_vote_count: int
 
 
-class VotingMap(BaseValidator):
-    voting_map: conlist(VotingObject, min_items=1, max_items=1) = None
-
-
-class GameDayBase(VotingMap):
+class GameDayBase(BaseValidator):
     game_id: int
     number: int
+    voting_map: conlist(VotingObject, min_items=0, max_items=1) = []
 
 
-class GameDayCreate(GameDayBase):
-    game_id: int = None
+class GameDayCreateRequest(GameDayBase):
+    pass
 
 
-class GameDayPatchRequest(VotingMap):
+class GameDayPatchRequest(GameDayBase):
     number: int = None
 
 
-class GameDayResponse(GameDayBase, VotingMap):
+class GameDayResponse(GameDayBase):
     pass

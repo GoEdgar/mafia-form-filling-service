@@ -6,7 +6,7 @@ from sqlalchemy.exc import IntegrityError
 from api.app import app
 from api.db import Session
 from model import DayModel
-from .validation import GameDayResponse, GameDayPatchRequest
+from .validation import GameDayResponse, GameDayCreateRequest, GameDayPatchRequest
 
 
 @app.post('/day')
