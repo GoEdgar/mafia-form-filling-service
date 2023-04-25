@@ -5,7 +5,7 @@ import pydantic
 from pydantic import conlist, ValidationError
 
 from api.common import BaseValidator
-from api.day.validation import GameDayCreate, GameDayBase
+from api.day.validation import GameDayCreateRequest, GameDayBase
 
 
 class StatusEnum(str, Enum):
@@ -49,7 +49,7 @@ class GameCreateRequest(GameBase):
     creator_id: int
     number: int
 
-    days: list[GameDayCreate] = []
+    days: list[GameDayCreateRequest] = []
 
 
 class GamePatchRequest(GameBase):

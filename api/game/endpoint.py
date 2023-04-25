@@ -1,16 +1,13 @@
 from datetime import datetime
 from datetime import timezone
-from bottle import request, response, Bottle, error
-from pydantic import ValidationError
+from bottle import request, response
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import joinedload
 
 from api.db import Session
-from app import exception_middleware
+from app import app, exception_middleware
 from model import GameModel, DayModel
 from .validation import GameCreateRequest, GamePatchRequest, GameResponse, GameListResponse, validate_game_constraints
-
-app = Bottle()
 
 
 @app.post('/game')
