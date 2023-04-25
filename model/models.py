@@ -53,5 +53,6 @@ class GameModel(Base):
     updated_at = Column(DateTime)
 
     __table_args__ = (
-        CheckConstraint("start_datetime < end_datetime", name="start_dt_greater_than_end_dt"),
+        CheckConstraint("start_datetime < end_datetime",
+                        name="start_dt_greater_than_end_dt"),
     )

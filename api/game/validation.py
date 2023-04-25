@@ -82,12 +82,12 @@ def validate_game_constraints(game):
         unique_ids = {
             game.host_id or game.creator_id,
             *(player[0] for player in game.players),
-            }
+        }
         if len(unique_ids) < len(game.players) + 1:
             raise ValueError("There are duplicates around players and host")
 
     # start_datetime < end_datetime constraint
     if all((game.start_datetime, game.end_datetime)) \
             and game.start_datetime.replace(tzinfo=timezone.utc) \
-                >= game.end_datetime.replace(tzinfo=timezone.utc):
+            >= game.end_datetime.replace(tzinfo=timezone.utc):
         raise ValueError("start_datetime should be greater than end_datetime")
