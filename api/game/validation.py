@@ -1,11 +1,10 @@
 from datetime import datetime, timezone
 from enum import Enum
 
-import pydantic
-from pydantic import conlist, ValidationError
+from pydantic import conlist
 
 from api.common import BaseValidator
-from api.day.validation import GameDayCreateRequest, GameDayBase
+from api.day.validation import GameDayBase, GameDayInlineCreateRequest
 
 
 class StatusEnum(str, Enum):
@@ -49,7 +48,7 @@ class GameCreateRequest(GameBase):
     creator_id: int
     number: int
 
-    days: list[GameDayCreateRequest] = []
+    days: list[GameDayInlineCreateRequest] = []
 
 
 class GamePatchRequest(GameBase):
