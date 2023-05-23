@@ -22,9 +22,15 @@ def create_game():
         new_game.inserted_at = game_data.inserted_at or datetime.now(tz=timezone.utc)
         new_game.updated_at = new_game.inserted_at
         new_game.start_datetime = game_data.start_datetime or new_game.inserted_at
-        new_game.days = [DayModel(**day.dict(exclude_none=True)) for day in
-                         game_data.days]
         session.add(new_game)
+        session.commit()
+
+        new_days = []
+        for day in game_data.days:
+            day_dict = day.dict(exclude_none=True)
+            day_dict["game_id"] = new_game.id
+            new_days.append(DayModel(**day_dict))
+        new_game.days = new_days
 
         try:
             session.commit()

@@ -11,7 +11,7 @@ class VotingObject(BaseValidator):
 
 
 class GameDayBase(BaseValidator):
-    number: int
+    number: int = None
     voting_map: conlist(VotingObject, min_items=0, max_items=1) = []
 
 
@@ -21,6 +21,7 @@ class GameDayCreateRequest(GameDayBase):
 
 class GameDayInlineCreateRequest(GameDayBase):
     pass
+
 
 class GameDayPatchRequest(GameDayBase):
     game_id: int

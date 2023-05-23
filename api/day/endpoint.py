@@ -9,6 +9,16 @@ from model import DayModel
 from .validation import GameDayResponse, GameDayCreateRequest, GameDayPatchRequest
 
 
+def get_last_day_number_of_game(session, game_id):
+    last_day = session.query(DayModel)\
+        .where(DayModel.game_id == game_id)\
+        .order_by(DayModel.number.desc())\
+        .limit(1)\
+        .one_or_none()
+
+    return last_day and last_day.number or 1
+
+
 @app.post('/day')
 def create_game_day():
     try:
@@ -19,6 +29,7 @@ def create_game_day():
 
     with Session() as session:
         new_day = DayModel(**game_data.dict())
+        new_day.number = new_day.number or get_last_day_number_of_game(session, new_day.game_id) + 1
         session.add(new_day)
 
         try:
